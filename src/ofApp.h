@@ -1,9 +1,15 @@
 #pragma once
 
+#include "MC.hpp"
 #include "ofMain.h"
+#include "ofVideoGrabber.h"
 
 class ofApp : public ofBaseApp{
 
+  mc::MC _mc;
+
+  ofVideoGrabber _camera;
+  
 	public:
 		void setup() override;
 		void update() override;

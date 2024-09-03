@@ -1,18 +1,31 @@
 #include "ofApp.h"
+#include "ofColor.h"
+#include "ofGraphics.h"
+#include "ofLog.h"
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+  ofSetLogLevel(OF_LOG_VERBOSE);
 
+  _camera.setup(1280, 720);
+  
+  _mc.setup("chapters", "distorted_maps");
+  // _mc.setup("distorted_maps", "distorted_maps");
+  _mc.start();
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-
+  _camera.update();
+  
+  _mc.update();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-
+  ofClear(ofColor::deepPink);
+  _camera.draw(0, 0);
+  _mc.draw(0, 0);
 }
 
 //--------------------------------------------------------------

@@ -2,9 +2,12 @@
 
 #include <ranges>
 #include "MC.hpp"
+#include "ofAppRunner.h"
+#include "ofGraphics.h"
 #include "ofMain.h"
 #include "ofFileUtils.h"
 #include "ofMath.h"
+#include "ofRectangle.h"
 #include "ofVideoPlayer.h"
 #include <algorithm>
 #include <memory>
@@ -46,6 +49,22 @@ using namespace std;
     Gen g {rd()};
     return g;
   }
+
+  //
+  // scale to window width;
+  // scaling by width
+  //
+  template <typename T>
+  float getScaleToWindowWidthFactor (shared_ptr<T> o) {
+    return ofGetWidth() / static_cast<float>(o->getWidth());
+  }
+
+  template <class T>
+  float getScaleToWindowWidthFactor (T &o) {
+    return ofGetWidth() / static_cast<float>(o.getWidth());
+  }
+
+
 
   //
   // Playlist
@@ -149,11 +168,21 @@ using namespace std;
     //
     // DRAW
     //
+    //
     void draw (int x, int y) {
       if (!_currentPlayer->isLoaded()) {
         return;
       }
-      _currentPlayer->draw(x, y);
+
+      float scaleF = getScaleToWindowWidthFactor(_currentPlayer);
+      int dy = (ofGetHeight() - _currentPlayer->getHeight()*scaleF) / 2;
+
+      ofPushMatrix();
+      ofScale(scaleF);
+      // we-
+      _currentPlayer->draw(x, y+dy);
+
+      ofPopMatrix();
     }
 
     //

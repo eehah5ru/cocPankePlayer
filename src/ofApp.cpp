@@ -7,7 +7,7 @@
 void ofApp::setup(){
   ofSetLogLevel(OF_LOG_VERBOSE);
 
-  _camera.setup(1280, 720);
+  _camera.setup(1920, 1080);
   
   _mc.setup("chapters", "distorted_maps");
   // _mc.setup("distorted_maps", "distorted_maps");
@@ -24,8 +24,21 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
   ofClear(ofColor::deepPink);
-  _camera.draw(0, 0);
+  drawCamera(0, 0);
   _mc.draw(0, 0);
+}
+
+
+void ofApp::drawCamera(int x, int y) {
+  float scaleF = mc::getScaleToWindowWidthFactor(_camera);
+  int dy = (ofGetHeight() - _camera.getHeight()*scaleF) / 2;
+  
+  ofPushMatrix(); 
+  ofScale(scaleF);
+  _camera.draw(x, y+dy);
+
+  ofPopMatrix();
+
 }
 
 //--------------------------------------------------------------

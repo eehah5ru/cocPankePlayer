@@ -1,5 +1,6 @@
 #pragma once
 
+#include <deque>
 #include <ranges>
 #include "MC.hpp"
 #include "ofAppRunner.h"
@@ -77,28 +78,56 @@ using namespace std;
 
     vector<VideoPlayerPtr> _players;
 
-    VideoPlayerPtr _currentPlayer;
+    deque<VideoPlayerPtr> _currentMix;
 
-    void setNewCurrent () {
+    // VideoPlayerPtr _currentPlayer;
+
+    void shufflePlaylist () {
       shuffle(_players.begin(), _players.end(), mk_random_gen());
 
       // only if we have more than one video in playlist
       if (_players.size() > 1) {
-
-        while (_currentPlayer == _players.front()) {
+        while (tryCurrentPlayer() == make_optional(_players.front())) {
           // shuffle players
           shuffle(_players.begin(), _players.end(), mk_random_gen());
         }
       }
 
-      _currentPlayer = _players.front();
+      _currentMix.clear();
+
+      _currentMix.insert(_currentMix.begin(), _players.begin(), _players.end());
 
 
-      _currentPlayer->setPosition(0.0);
-      _currentPlayer->stop();
+      // LOG_MC_VERBOSE() << _name << ": new current set to " << _currentPlayer->getMoviePath();
+    }
 
-      LOG_MC_VERBOSE() << _name << ": new current set to " << _currentPlayer->getMoviePath();
+    optional<VideoPlayerPtr> tryCurrentPlayer () {
+      if (_currentMix.empty()) {
+        return nullopt;
+      }
+      return _currentMix.front();
+    }
 
+    VideoPlayerPtr currentPlayer() {
+      if (_currentMix.empty()) {
+        throw logic_error("tryijng to get current player from empty mix");
+      }
+
+      return _currentMix.front();
+    }
+
+    void changePlayer () {
+      currentPlayer()->setPosition(0.0);
+      currentPlayer()->stop();
+
+      _currentMix.pop_front();
+
+      // getting new  permutation;
+      if (_currentMix.empty()) {
+        shufflePlaylist();
+      }
+      currentPlayer()->setPosition(0.0);
+      currentPlayer()->stop();
     }
 
   public:
@@ -138,31 +167,31 @@ using namespace std;
         }
 
         player->load(f.path());
-        ofGstVideoPlayer p;
+        // ofGstVideoPlayer p;
         // p.getGstVideoUtils()->getPipeline()->
         _players.push_back(player);
       }
 
-      setNewCurrent();
+      shufflePlaylist();
     }
 
     //
     // UPDATE
     //
     void update () {
-      if (!_currentPlayer->isLoaded()) {
+      if (!currentPlayer()->isLoaded()) {
         return;
       }
 
-      if (_currentPlayer->isPaused()) {
+      if (currentPlayer()->isPaused()) {
         return;
       }
 
-      if (!_currentPlayer->isPlaying()) {
+      if (!currentPlayer()->isPlaying()) {
         return;
       }
 
-      _currentPlayer->update();
+      currentPlayer()->update();
 
       // if (_currentPlayer->getIsMovieDone()) {
       //   _currentPlayer->stop();
@@ -175,17 +204,17 @@ using namespace std;
     //
     //
     void draw (int x, int y) {
-      if (!_currentPlayer->isLoaded()) {
+      if (!currentPlayer()->isLoaded()) {
         return;
       }
 
-      float scaleF = getScaleToWindowWidthFactor(_currentPlayer);
-      int dy = (ofGetHeight() - _currentPlayer->getHeight()*scaleF) / 2;
+      float scaleF = getScaleToWindowWidthFactor(currentPlayer());
+      int dy = (ofGetHeight() - currentPlayer()->getHeight()*scaleF) / 2;
 
       ofPushMatrix();
       ofScale(scaleF);
       // we-
-      _currentPlayer->draw(x, y+dy);
+      currentPlayer()->draw(x, y+dy);
 
       ofPopMatrix();
     }
@@ -197,30 +226,37 @@ using namespace std;
       LOG_MC_VERBOSE() << _name << ": starting video";
       if (isVideoDone()) {
         LOG_MC_VERBOSE() << _name << ": video is done. loading new one";
-        setNewCurrent();
+        changePlayer();
       }
-      _currentPlayer->play();
+      currentPlayer()->play();
     }
 
     //
     // STOP
     //
     void stop () {
-      _currentPlayer->stop();
+      currentPlayer()->stop();
     }
 
     //
     // isVideoDone
     //
     bool isVideoDone () {
-      return _currentPlayer->getIsMovieDone();
+      return currentPlayer()->getIsMovieDone();
+    }
+
+    //
+    // check if playlist is over
+    //
+    bool isPlaylistDone() {
+      return _currentMix.empty();
     }
 
     //
     // IS PLAYING
     //
     bool isPlaying () {
-      return _currentPlayer->isPlaying();
+      return currentPlayer()->isPlaying();
     }
 
   };

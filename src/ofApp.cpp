@@ -7,8 +7,9 @@
 void ofApp::setup(){
   ofSetLogLevel(OF_LOG_VERBOSE);
 
-  _camera.setup(1920, 1080);
-  
+  // _camera.setup(1920, 1080);
+
+  _camera.setup(1280, 720);
   _mc.setup("chapters", "distorted_maps");
   // _mc.setup("distorted_maps", "distorted_maps");
   _mc.start();

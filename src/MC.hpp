@@ -9,6 +9,7 @@
 #include "ofMath.h"
 #include "ofRectangle.h"
 #include "ofVideoPlayer.h"
+#include "ofGstVideoPlayer.h"
 #include <algorithm>
 #include <memory>
 #include <optional>
@@ -119,6 +120,8 @@ using namespace std;
 
       _dir.allowExt("mov");
       _dir.allowExt("mp4");
+      _dir.allowExt("webm");
+
 
       _dir.listDir();
 
@@ -135,6 +138,8 @@ using namespace std;
         }
 
         player->load(f.path());
+        ofGstVideoPlayer p;
+        // p.getGstVideoUtils()->getPipeline()->
         _players.push_back(player);
       }
 

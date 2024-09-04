@@ -6,6 +6,8 @@
 
 class ofApp : public ofBaseApp {
 
+  bool _videoEnabled = true;
+  
 	mc::MC _mc;
 
 	ofVideoGrabber _camera;

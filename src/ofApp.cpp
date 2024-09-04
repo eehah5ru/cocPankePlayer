@@ -25,7 +25,9 @@ void ofApp::update(){
 void ofApp::draw(){
   ofClear(ofColor::deepPink);
   drawCamera(0, 0);
-  _mc.draw(0, 0);
+  if (_videoEnabled) {
+    _mc.draw(0, 0);
+  }
 }
 
 
@@ -48,7 +50,9 @@ void ofApp::exit(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-
+  if (key == 'v') {
+    _videoEnabled = !_videoEnabled;
+  }
 }
 
 //--------------------------------------------------------------

@@ -99,7 +99,17 @@ using namespace std;
 
       _currentMix.clear();
 
-      _currentMix.insert(_currentMix.begin(), _players.begin(), _players.end());
+      for (auto p : _players) {
+        _currentMix.push_back(p);
+      }
+
+      LOG_MC_NOTICE() << "current playlist:";
+
+      for (auto p: _currentMix) {
+        LOG_MC_NOTICE() << p->getMoviePath();
+      }
+
+      // _currentMix.insert(_currentMix.begin(), _players.begin(), _players.end());
 
 
       // LOG_MC_VERBOSE() << _name << ": new current set to " << _currentPlayer->getMoviePath();
@@ -156,14 +166,15 @@ using namespace std;
       _dir.allowExt("mp4");
       _dir.allowExt("webm");
 
-
       _dir.listDir();
+      ofDirectory sorted = _dir.getSorted();
+      // sorted.listDir();
 
-      if (_dir.size() == 0) {
-        throw invalid_argument(format("no videos in direcotry '{}'", _dir.path()));
+      if (sorted.size() == 0) {
+        throw invalid_argument(format("no videos in direcotry '{}'", sorted.path()));
       }
 
-      for (ofFile f : _dir) {
+      for (ofFile f : sorted) {
         VideoPlayerPtr player = make_shared<ofVideoPlayer>();
 
         if (alpha) {

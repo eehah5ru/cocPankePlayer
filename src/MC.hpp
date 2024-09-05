@@ -76,6 +76,8 @@ using namespace std;
 
     string _name;
 
+    bool _permute = true;
+
     vector<VideoPlayerPtr> _players;
 
     deque<VideoPlayerPtr> _currentMix;
@@ -83,13 +85,15 @@ using namespace std;
     // VideoPlayerPtr _currentPlayer;
 
     void shufflePlaylist () {
-      shuffle(_players.begin(), _players.end(), mk_random_gen());
+      if (_permute) {
+        shuffle(_players.begin(), _players.end(), mk_random_gen());
 
-      // only if we have more than one video in playlist
-      if (_players.size() > 1) {
-        while (tryCurrentPlayer() == make_optional(_players.front())) {
-          // shuffle players
-          shuffle(_players.begin(), _players.end(), mk_random_gen());
+        // only if we have more than one video in playlist
+        if (_players.size() > 1) {
+          while (tryCurrentPlayer() == make_optional(_players.front())) {
+            // shuffle players
+            shuffle(_players.begin(), _players.end(), mk_random_gen());
+          }
         }
       }
 
@@ -134,8 +138,9 @@ using namespace std;
     //
     // SETUP
     //
-    void setup (string name, string &path, bool alpha = false) {
+    void setup (string name, string &path, bool alpha = false, bool permute = true) {
       _name = name;
+      _permute = permute;
 
       if (path.empty()) {
         throw invalid_argument("path is empty");
@@ -299,8 +304,8 @@ using namespace std;
     // SETUP
     //
     void setup(string &&chaptersPath, string &&distortedMapsPath) {
-      _chapters->setup("chapters", chaptersPath, false);
-      _distortedMaps->setup("distortedMaps", distortedMapsPath, true);
+      _chapters->setup("chapters", chaptersPath, true, false);
+      _distortedMaps->setup("distortedMaps", distortedMapsPath, true, true);
 
       _currentPlaylist = getRandomPlaylist();
 

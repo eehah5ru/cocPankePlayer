@@ -423,14 +423,18 @@ using namespace std;
     // NEXT
     //
     void next () {
-      _currentPlaylist->next();
+      // _currentPlaylist->next();
+      changePlaylist();
+      start();
     }
 
     //
     // PEVIOUS
     //
     void previous () {
-      _currentPlaylist->previous();
+      // _currentPlaylist->previous();
+      changePlaylist();
+      start();
     }
 
 

@@ -58,6 +58,18 @@ void ofApp::keyPressed(int key){
   if (key == 'v') {
     _videoEnabled = !_videoEnabled;
   }
+
+  if (key == 'p') {
+    _mc.previous();
+  }
+
+  if (key == 'n') {
+    _mc.next();
+  }
+
+  if (key == ' ') {
+    _mc.pause();
+  }
 }
 
 //--------------------------------------------------------------

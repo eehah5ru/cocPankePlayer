@@ -199,14 +199,17 @@ using namespace std;
         return;
       }
 
-      if (currentPlayer()->isPaused()) {
+      // if (currentPlayer()->isPaused()) {
+      //   return;
+      // }
+
+      // if (!currentPlayer()->isPlaying()) {
+      //   return;
+      // }
+
+      if (!isPlaying()) {
         return;
       }
-
-      if (!currentPlayer()->isPlaying()) {
-        return;
-      }
-
       currentPlayer()->update();
 
       // if (_currentPlayer->getIsMovieDone()) {
@@ -255,6 +258,35 @@ using namespace std;
     }
 
     //
+    // NEXT
+    //
+    void next () {
+      stop();
+      shufflePlaylist();
+    }
+
+    //
+    // PREVIOUS
+    //
+    void previous () {
+      stop();
+      shufflePlaylist();
+    }
+
+    //
+    // PAUSE
+    //
+    void pause () {
+      // if (currentPlayer()->isPaused()) {
+      //   currentPlayer()->play();
+      // } else {
+      //   currentPlayer()->p
+      // }
+      bool p = currentPlayer()->isPaused();
+      currentPlayer()->setPaused(!p);
+    }
+
+    //
     // isVideoDone
     //
     bool isVideoDone () {
@@ -272,7 +304,7 @@ using namespace std;
     // IS PLAYING
     //
     bool isPlaying () {
-      return currentPlayer()->isPlaying();
+      return !(currentPlayer()->isPaused());
     }
 
   };
@@ -362,5 +394,28 @@ using namespace std;
     void stop () {
       _currentPlaylist->stop();
     }
+
+    //
+    // NEXT
+    //
+    void next () {
+      _currentPlaylist->next();
+    }
+
+    //
+    // PEVIOUS
+    //
+    void previous () {
+      _currentPlaylist->previous();
+    }
+
+
+    //
+    // PAUSE
+    //
+    void pause () {
+      _currentPlaylist->pause();
+    }
+
   };
 }

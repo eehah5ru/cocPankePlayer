@@ -78,6 +78,8 @@ using namespace std;
 
     bool _permute = true;
 
+    bool _isPaused = false;
+
     vector<VideoPlayerPtr> _players;
 
     deque<VideoPlayerPtr> _currentMix;
@@ -207,9 +209,10 @@ using namespace std;
       //   return;
       // }
 
-      if (!isPlaying()) {
+      if (_isPaused || !isPlaying()) {
         return;
       }
+
       currentPlayer()->update();
 
       // if (_currentPlayer->getIsMovieDone()) {
@@ -247,6 +250,7 @@ using namespace std;
         LOG_MC_VERBOSE() << _name << ": video is done. loading new one";
         changePlayer();
       }
+      _isPaused = false;
       currentPlayer()->play();
     }
 
@@ -255,22 +259,26 @@ using namespace std;
     //
     void stop () {
       currentPlayer()->stop();
+      _isPaused = false;
     }
 
     //
     // NEXT
     //
     void next () {
-      stop();
-      shufflePlaylist();
+      // stop();
+      // shufflePlaylist();
+      LOG_MC() << "force changing video";
+      changePlayer();
     }
 
     //
     // PREVIOUS
     //
     void previous () {
-      stop();
-      shufflePlaylist();
+      LOG_MC() << "force changing video";
+
+      changePlayer();
     }
 
     //
@@ -282,14 +290,19 @@ using namespace std;
       // } else {
       //   currentPlayer()->p
       // }
-      bool p = currentPlayer()->isPaused();
-      currentPlayer()->setPaused(!p);
+      // bool p = currentPlayer()->isPaused();
+      _isPaused = !_isPaused;
+      currentPlayer()->setPaused(_isPaused);
+      LOG_MC() << "toggle pause: " << _isPaused;
     }
 
     //
     // isVideoDone
     //
     bool isVideoDone () {
+      if (isForcePaused()) {
+        return false;
+      }
       return currentPlayer()->getIsMovieDone();
     }
 
@@ -305,6 +318,13 @@ using namespace std;
     //
     bool isPlaying () {
       return !(currentPlayer()->isPaused());
+    }
+
+    //
+    // IS FORCE PAUSED
+    //
+    bool isForcePaused () {
+      return _isPaused;
     }
 
   };
@@ -365,6 +385,10 @@ using namespace std;
       if (_currentPlaylist->isVideoDone()) {
         changePlaylist();
         _currentPlaylist->start();
+      }
+
+      if (_currentPlaylist->isForcePaused()) {
+        return;
       }
 
       if (!_currentPlaylist->isPlaying()) {
